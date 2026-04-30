@@ -1,0 +1,1767 @@
+
+<!DOCTYPE html>
+<html lang="fi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+        <title>Lappeenrannan Energia - MinunEnergia - Käytön raportointi</title>
+        <meta name="description" content="Lappeenrannan Energia - MinunEnergia - Käytön raportointi" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="icon" href="/Content/LRE2/images/favicon.ico" />
+
+    <script src="/bundles/jquery?v=FVs3ACwOLIVInrAl5sdzR2jrCDmVOWFbZMY6g6Q0ulE1"></script>
+
+
+    <script src="/bundles/jquery-globalize?v=VNVLAWmNEpg6_IBOCVoHulG7G0uWv9mY7a0SDeKnouU1"></script>
+
+
+    <script src="/bundles/default?v=U0uzJsjDNOUXvApEiNDuK4T99X27YPuRBZb5wGv1Bx41"></script>
+
+
+    <script src="/bundles/bootstrap?v=w0yDtvKAZWlUy-XT5NyYROLotC27w9V6oafgSM56J141"></script>
+
+    <link href="/bundles/bootstrapcss?v=pQl59FZXakDWV4AWrXcJtob_Y59-fBFBPh3J-nYKRAo1" rel="stylesheet"/>
+
+
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/Content/LRE2/print.css?version=NjM4OTkxMzA4MTYxODg2MDY0" media="print">
+    <link href="/Content/themes/base-1.12.0/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/LRE2/Common.css?version=NjM4OTkxMzA4MTYxMjk3NTA0" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <script src="/Scripts/jquery.signalR-2.4.3.js" type="text/javascript"></script>
+    <script src="/signalr/hubs" type="text/javascript"></script>
+    <script src="/Scripts/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.validate.unobtrusive.min.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery-migrate-1.4.1.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+            
+            $.post("/eServices/Online/IsAuthenticated", function (data) {
+                if (data != null && data.IsAuthenticated != null && data.IsAuthenticated == false) {
+                    $("body").hide();
+                    window.location = "/eServices/Online/Logout";
+                }
+            });
+            
+        var dataTableTexts = {
+            sEmptyTable: "Tietoja ei löytynyt",
+            sLoadingRecords: "Ladataan...",
+            oPaginate: { "sFirst": "Ensimmäinen ", "sLast": " Viimeinen", "sNext": " Seuraava", "sPrevious": "Edellinen " },
+            sInfo: "Näytetään _START_ - _END_. Kokonaismäärä: _TOTAL_ ",
+            sInfoEmpty: "&nbsp;",
+            sInfoFiltered: "(Suodatettu _MAX_:n joukosta)",
+            sZeroRecords: "Valintoja vastaavia tietoja ei löytynyt",
+            sSearch: "Hakuehto",
+            sLengthMenu: "_MENU_ hakutulosta per sivu"
+        };
+
+        // Instruct moment.js library to format dates in Finnish.
+        moment.lang('fi');
+        if (typeof console === "undefined") {
+            console = { log: function () { }, error: function () { }, trace: function () { }, dir: function () { } };
+        }
+
+        var selectedCulture = "";
+        var apiUrl = "https://minunenergia.fi/api/";
+        var userName = "";
+        var SessionTimeOutUrl = "/Default/IsSessionExpired";
+        var SessionTimeOutRedirectUrl = "/Default/SessionExpired";
+
+        function showErrorMessage(message) {
+            $("#infoMessage").text(message);
+            $("#infoArea").show();
+        }
+
+        $(function () {
+
+            //This hides validation errors from fields
+            $("form input").on("change keydown paste input", function (ev) {
+                _notificator.hideValidationError(this);
+            });
+
+            var culture = 'fi-FI';
+
+            Globalize.culture(culture);
+
+            if ($.validator) {
+                $.validator.methods.number = function (value, element) {
+                    if (Globalize.parseFloat(value)) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+                userName = "samisaalasti";
+
+        });
+    </script>
+
+        <script>
+            var _prum = [['id', '5601443eabe53dd6627f8ac3'],
+            ['mark', 'firstbyte', (new Date()).getTime()]];
+            (function () {
+                var s = document.getElementsByTagName('script')[0], p = document.createElement('script'); p.async = 'async'; p.src = '//rum-static.pingdom.net/prum.min.js'; s.parentNode.insertBefore(p, s);
+            }
+            )();
+        </script>
+
+        <!-- Google Tag Manager -->
+        <script>
+            (function (w, d, s, l, i) {
+                w[l] = w[l] || []; w[l].push(
+                    { 'gtm.start': new Date().getTime(), event: 'gtm.js' }
+                ); var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-5XMSQJ7');</script>
+        <!-- End Google Tag Manager -->
+
+    
+
+    <style>
+        .div-table {
+            display: table;
+            border: 1px solid #003399;
+        }
+
+        .div-table-caption {
+            display: table-caption;
+            background: #009999;
+        }
+
+        .div-table-row {
+            display: table-row;
+        }
+
+        .div-table-col {
+            display: table-cell;
+            padding: 5px;
+            border: 1px solid #003399;
+        }
+
+        table th {
+            vertical-align: top !important;
+        }
+
+        .legendColorBox, .legendLabel {
+            border-top: none !important;
+            line-height: 12px !important;
+            padding: 2px 2px 2px !important;
+            font-size: 10px !important;
+        }
+
+        .pieChart {
+            width: 260px;
+            height: 260px;
+        }
+
+        @media (max-width: 768px) {
+            .xAxis .tickLabel {
+                padding-top: 15px;
+                padding-bottom: 10px;
+                font-size: x-small;
+                -ms-transform: rotate(90deg); /* IE 9 */
+                -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
+                transform: rotate(90deg);
+            }
+
+            #noteChart .tickLabels .yAxis .tickLabel {
+                font-size: x-small !important;
+            }
+
+            #consumptionLegends td {
+                float: left;
+            }
+
+            #notesLegends td {
+                float: left;
+            }
+        }
+
+        #noteChart {
+            margin-left: 10px;
+        }
+
+            #noteChart .tickLabels .yAxis .tickLabel {
+                text-align: left !important;
+                width: 70px !important;
+                line-height: 80%;
+                font-size: small;
+            }
+
+        .active.btn-default {
+            background-color: #d24719 !important;
+            color: #fff !important;
+        }
+
+        .btn, .form-control, .btn-group-sm > .btn {
+            border-radius: 100px;
+        }
+
+        #tableDataContainer {
+            overflow-x: auto;
+        }
+
+        .readings-col-header {
+            padding-right: 10px;
+        }
+    </style>
+
+    <script src="/Scripts/flot-0.8.3/jquery.flot.js" type="text/javascript"></script>
+    <script src="/Scripts/flot-0.8.3/jquery.flot.selection.js" type="text/javascript"></script>
+    <script src="/Scripts/flot-0.8.3/jquery.flot.threshold.js" type="text/javascript"></script>
+    <script src="/Scripts/flot-0.8.3/jquery.flot.navigate.js" type="text/javascript"></script>
+    <script src="/Scripts/flot-0.8.3/jquery.flot.stack.js" type="text/javascript"></script>
+    <script src="/Scripts/flot-0.8.3/jquery.flot.pie.js" type="text/javascript"></script>
+    <script src="/Scripts/flot/jquery.flot.tickrotor.js" type="text/javascript"></script>
+    <script src="/Scripts/flot-0.8.3/jquery.flot.time.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var isIE8 = false;
+    </script>
+    <!--[if lte IE 8]>
+        <script language="javascript" type="text/javascript" src="/Scripts/flot/flashcanvas.js"> </script>
+        <script type="text/javascript">
+            var isIE8 = true;
+        </script>
+    <![endif]-->
+
+    <script src="/Scripts/jquery.ui.datepicker-fi.js" type="text/javascript"></script>
+    <script src="/Scripts/DataTables-1.9.4/media/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/Content/default/reporting-print.css?version=NjM4OTkxMzA4MTU2MTg1MDUz" type="text/css" media="print">
+    <script src="/Scripts/jquery.table2CSV.js" type="text/javascript"></script>
+    <script src="/Areas/Reporting/Scripts/PBE/MeteringPointConsumptionHistoryNote.js" type="text/javascript"></script>
+    <script src="/Areas/Reporting/Scripts/LRE2/MeteringPointProfilingDialog.js?version=NjM4OTkxMzA4MTUwNzQ0MTA5" type="text/javascript"></script>
+    <script src="/Scripts/jquery.cookie.js" type="text/javascript"></script>
+    <script src="/Areas/Reporting/Scripts/LRE2/ReportSubscription.js?version=NjM4OTkxMzA4MTUwNzQ0MTA5" type="text/javascript"></script>
+    <script src="/Areas/Reporting/Scripts/LRE2/ReportCompare.js?version=NjM4OTkxMzA4MTUwNzQ0MTA5" type="text/javascript"></script>
+    <script src="/Areas/Reporting/Scripts/pricesPieChart.js?version=NjM4OTkxMzA4MTUxMDIyNjg2" type="text/javascript"></script>
+    <script src="/Scripts/inpulse/ApiHelpers.js?version=NjM4OTk1OTAyNDI4OTU0MTAy" type="text/javascript"></script>
+    <script src="/Scripts/select2/select2.js" type="text/javascript"></script>
+    <script src="/Scripts/select2/Select2-locales/select2_locale_fi.js" type="text/javascript"></script>
+
+    <!-- trasanen 13.9.2017 LRECRM-280-->
+    <script type="text/javascript" src="/Scripts/select2/select2.js"></script>
+    <script type="text/javascript" src="/Scripts/select2/Select2-locales/select2_locale_fi.js"></script>
+    <link href="/Scripts/select2/css/select2.css" rel="stylesheet" />
+    <link href="/Scripts/select2/css/select2-bootstrap.css" rel="stylesheet" />
+
+    <script src="/Areas/Reporting/Scripts/intervalValidator.js?version=NjM4OTk1OTAyNDM1Nzc0NzEx" type="text/javascript"></script>
+
+    <script language="javascript" type="text/javascript">
+
+        function getTranslatedText(source) {
+            if (source in translations) {
+                return translations[source]
+            }
+            return source;
+        }
+
+        translations = {
+            "Sähkö": "Sähkö",
+            "Kaukolämpö": "Kaukolämpö",
+            "days": "päivää",
+            "months": "kuukautta"
+        }
+
+        var debug = true;
+        var GenerateExcelFileUrl = "/Reporting/CustomerConsumption/GenerateExcelFile";
+        var DownloadExcelFileUrl = "/Reporting/CustomerConsumption/DownloadExcelFile";
+
+        var compareConsumptionElTitle = "Tästä voit vertailla omaa sähkönkulutustasi muihin vastaaviin kohteisiin. Vertailutiedot: Motiva.";
+        var compareConsumptionWaTitle = "Tästä voit vertailla omaa vedenkulutustasi keskimääräiseen vedenkulutukseen. Vertailutiedot: Motiva";
+
+        var islastYearDataLoad = "False" == "True" ? true : false;
+        var graphOptions = {
+            updateJsonCall: "/Reporting/CustomerConsumption/GetConsumptionModel",
+            updateHourlyDataJsonCall: "/Reporting/SessionlessConsumption/SessionlessGetHourlyConsumption",
+            updateFullDataJsonCall: "/Reporting/SessionlessConsumption/SessionlessGetFullConsumption",
+            translations: {
+                noPricesAvailable: "Tietoa kustannuksista ei ole käytössä.",
+                tooEarlyStartDate: "Liian aikainen alkupäivämäärä.",
+                tooLateEndDate: "Liian myöhäinen loppupäivämäärä.",
+                dataLoadingErrorText: "Kulutustietojen lataus epäonnistui palvelinvirheen vuoksi.",
+                loadingText: "Ladataan...",
+                averageTemperatureText: "Keskilämpötila",
+                totalExpenseText: "Kustannus",
+                totalEnergyConsumptionText: "Energian kulutus",
+                totalTemperatureCorrectedEnergyConsumptionText: "Lämpötilakorjattu energian kulutus",
+                temperatureCorrectedLabelText: "Lämpötilakorjattu kulutus",
+                reactivePowerLabelText: "Loisteho",
+                reactivePowerProductionLabelText: "Loistehon tuotanto",
+                toolTipHeaderText: "Ajanjakso",
+                allYearsText: "Kaikki vuodet",
+                energyConsumptionTitleText: "Käyttö",
+                outdoorTemperatureTitleText: "Ulkolämpötila",
+                PowerProductionLabelText: "Tuotanto",
+                priceTitleText: "Hinta",
+                statusCalculated: "Laskettu",
+                statusMissing: "Puuttuu",
+                statusMeasured: "Mitattu",
+                electricitySalesBasicPrice: "Myynnin perusmaksu",
+                electricitySalesEnergyPrice: "Myynnin energiamaksu",
+                electricitySalesEnergyPrice2: "Myynnin energiamaksu",
+                electricityNetworkBasicPrice: "Siirron perusmaksu",
+                electricityNetworkEnergyPrice: "Siirtomaksu",
+                electricityNetworkEnergyPrice2: "Siirtomaksu",
+                electricityEnergyTax: "Energiavero",
+                electricityConsumptionSum: "yhteensä",
+                reactivePowerLabelHigh: "huippu",
+                reactivePowerProductionLabelHigh: "huippu",
+                activePowerLabelText: "Pätöteho",
+                activePowerLabelHigh: "huippu",
+                activePowerProductionLabelText: "Pätötehon tuotanto",
+                activePowerProductionLabelHigh: "huippu",
+                WeekDayHeader: "Viikonpäivä",
+                HeatingReadingStartDate: "Alkupäivämäärä",
+                HeatingReadingEndDate: "Loppupäivämäärä",
+                HeatingReadingConsumption: "Kulutus",
+                HeatingReadingTotalCost: "Kustannukset",
+                HeatingReadingBasicFareCost: "Kustannukset perusmaksu",
+                HeatingReadingEnergyCost: "Kustannukset energia",
+                WaterReadingStartDate: "Alkupäivämäärä",
+                WaterReadingEndDate: "Loppupäivämäärä",
+                WaterReadingConsumption: "Kulutus",
+                WaterReadingTotalCost: "Kustannukset",
+                UseplaceAddress: "Osoite",
+                CalculatedResultsWarning: "Kohteesta ei mitata energiankulutusta tuntitasolla, joten raportissa näytettävät tuntikulutukset ovat laskennallisia.",
+                ResolutionHour: "Päiväys ja klo", //trasanen 16.2.2018 SQLET-537
+                ResolutionMonth: "Kuukausi",
+                ResolutionDay: "Päivämäärä",
+                ResolutionWeek: "Viikko",
+                ResolutionYear: "Vuosi",
+                Temperature: "Lämpötila",
+                AverageTemperature: "Keskilämpötila",
+                EnergyTotal: "Käyttö yhteensä", //trasanen 16.2.2018 SQLET-537
+                EnergyConsumption: "Energian kulutus",
+                TemperatureCorrectedConsumption: "Lämpötilakorjattu kulutus",
+                WaterFlow: "Vesivirta",
+                Cooling: "Jäähtymä",
+                WaterInTemperature:"Menoveden lämpötila",
+                WaterOutTemperature:"Paluuveden lämpötila",
+                TotalCostTable: "Kustannukset yhteensä", //trasanen 16.2.2018 & 5.3.2018 SQLET-537
+                TotalCostNoVatTable:"Kustannukset yhteensä ALV 0%", //trasanen 16.2.2018 & 5.3.2018 SQLET-537
+                vat: "Arvonlisävero",
+                SalesBasicFareCostTable: "Myynnin perusmaksu", //trasanen 16.2.2018 SQLET-537
+                SalesCost: "kustannus myynti (&euro;)", //trasanen 16.2.2018 SQLET-537
+                NetworkBasicFareCostTable: "Siirron perusmaksu", //trasanen 16.2.2018 SQLET-537
+                NetworkCost: "kustannus siirto (&euro;)", //trasanen 16.2.2018 SQLET-537
+                ReactivePower: "Induktiivinen loisteho",
+                ReactivePowerProduction: "Kapasitiivinen loisteho",
+                RowsTotal: "Rivejä yhteensä",
+                Next: "Seuraava",
+                Previous: "Edellinen",
+                MeteringPointCode: "Käyttöpaikkatunnus",
+                SingleTime: "Yksiaikainen",
+                Night: "Yö",
+                Day: "Päivä",
+                WinterDay: "Talviarkipäivä",
+                OtherTime: "Muu aika",
+                PowerDay: "Arkipäivä",
+                EnergyTaxClass1: "Sähkön veroluokka 1",
+                EnergyTaxClass2: "Sähkön veroluokka 2",
+                HeatingPower: "Lämmön kulutus",
+                HeatingBasicPrice: "Lämmön perusmaksu",
+                EnergyPrice: "Lämmön energiamaksu",
+                TotalCost: "Kokonaiskustannukset",
+                Heat: "Lämmitys",
+                heatingBasicPrice: "Perusmaksu",
+                heatingEnergyPrice: "Energiamaksu",
+                heatingSalesBasicPrice: "Myynnin perusmaksu",
+                heatingSalesEnergyPrice: "Myynnin energiamaksu",
+                heatingNetworkBasicPrice: "Siirron perusmaksu",
+                heatingNetworkEnergyPrice: "Siirron energiamaksu",
+                table_help_1: "Ajanjakso, jolta rivin arvot ovat.",
+                table_help_2: "Viikonpäivä.",
+                table_help_3: "Kokonaisenergian kulutus ajanjaksolla.",
+                table_help_4: "Energian kulutus",
+                table_help_5: "Energian kulutus",
+                table_help_6: "Lämpötilakorjattu energian kulutus",
+                table_help_7: "Tilavuusvirta",
+                table_help_8: "Menoveden lämpötila (hetkellissarvo)",
+                table_help_9: "Paluuveden lämpötila (hetkellissarvo)",
+                table_help_10: "Laskennallinen jäähtymä",
+                table_help_11: "Mittauksen status mitattu/arvioitu",
+                table_help_12: "Kokonaiskustannukset",
+                table_help_13: "Perusmaksu",
+                table_help_14: "Energiamaksu",
+                table_help_15: "Energiamaksu",
+                table_help_16: "Perusmaksu",
+                table_help_17: "Energiamaksu",
+                table_help_18: "Energiamaksu",
+                table_help_19: "Energiavero",
+                table_help_20: "Huipputehomaksu",
+                table_help_21: "Loistehomaksu",
+                table_help_22: "Ulkolämpötila",
+                table_help_23: "Loisteho ei ole työtä tekevää tehoa (toisin kuin pätöteho), vaan se värähtelee edestakaisin kuorman ja siirtoverkon välillä. Loistehon siirtäminen kuormittaa sen aiheuttaman virran takia siirtojohtoja.",
+                table_help_24: "Loisteho (tuotanto)",
+                table_help_25: "Tuotanto",
+                table_help_26: "",
+                table_help_27: "Esitetyt hinnat sisältävät marginaalin ja arvonlisäveron.",
+                table_help_27_NoVAT: "Esitetyt hinnat sisältävät marginaalin.",
+                table_help_32: "Kokonaiskulutus",
+                table_help_33: "Kokonaistuotanto",
+                table_help_35: "Energiayhteisön tuotanto",
+                table_help_36: "Energiayhteisön kulutus",
+                waterConsumptionTitleText : "Veden kulutus",
+                drillDownBtnText:"Tarkenna tähän",
+                toolTipCloseBtnText:"Sulje",
+                MeasuredDegreeDayValue:"Lämmitystarveluku",
+                heatingEnergyLabel: "Energian kulutus", //trasanen 21.10.2017
+                gasEnergyLabel: "Energian kulutus",//trasanen 21.10.2017
+                spotPrice: "Spot hinta (snt/kWh)",//trasanen 14.1.2018
+                spotPriceNoVAT: "Spot hinta ALV 0% (snt/kWh)",
+                salesPricesHeaderDHGas: "Myynnin energiamaksu (&euro;)",
+                networkPricesHeaderDHGas: "Siirron energiamaksu (&euro;)",
+                waterPrice: "Puhdasvesimaksu",
+                NettedConsumptionLabelText: "Kokonaiskulutus",
+                NettedProductionLabelText: "Kokonaistuotanto"
+            }
+        };
+
+        notesTranslations= {
+            noteSubject:"Aihe",
+            noteStartDate:"Alkuaika",
+            noteEndDate:"Loppuaika",
+            noteNote:"Kuvaus",
+            notesNoNotes:"Ei muistiinpanoja valitulle ajanjaksolle.",
+            newNote: "Uusi muistiinpano12",
+            editNote: "Muokkaa muistiinpanoa12"
+        }
+
+        var model = {"IsValid":false,"Message":"Käyttöpaikkaa  ei löydy tai asiakkaalla 1044351:LRE000, 25399:VESI, 1044351:LAMPO ei ole sinne voimassaolevaa sopimusta.","HasTemperatureSeries":false,"HasReactivePowerSeries":false,"WaterConsumptionAndReadingsAvailable":false,"PowerUnit":null,"DataInterval":null,"Minutes15":null,"Hours":null,"Days":null,"Weeks":null,"Months":null,"Years":null,"ElectricityReadingData":null,"HeatingReadingData":null,"WaterReadingData":null,"GasReadingData":null,"ComparisonGroup":null,"ProfilingDetail":null,"Notes":null,"SalesPriceList":null,"NetworkPriceList":null,"EnergyTaxes":null,"Vat":null,"EnergyConsumptionCorrections":null,"UseReadings":false,"HourlyDataAvailable":false,"UtilityType":0,"CustomerType":0,"LowTemperature":-25.0,"HighTemperature":25.0,"HasProviderHourlyValuesSeparateLoadingSupport":false,"HasHourlyValues":false,"HasMinutes15Values":false,"FullConsumptionLoaded":false,"MeteringPoint":null,"PriceLimitPriceList":null,"PriceGuaranteedPriceList":null,"ServiceProductPriceList":null,"NettedConsumption":null,"NettedProduction":null,"EnergyCommunityCalculatedConsumption":null,"EnergyCommunityCalculatedProduction":null,"ContractTypeId":null,"HasWaterHourlyValues":false,"SingleReportConsumer":null,"EarliestContractStartDate":null};
+
+        var GraphContext = {"IsValid":false,"Message":"Tietojesi latauksessa tapahtui virhe (Customer 1044351:LRE000;25399:VESI;1044351:LAMPO does not have a valid contract for metering point 2008364:LRE000.)","CustomerType":0,"CustomerCode":null,"SourceCompanyCode":null,"NetworkCode":null,"ExternalMeteringPointCode":null,"MeteringPointCode":null,"MpSourceCompanyCode":null,"StreetAddress":null,"ZipCode":null,"PostOffice":null,"ActiveTarificationId":0,"GsrnCode":null,"CISMeteringPointCode":null,"MeteringGridAreaCode":null,"selectedActiceTarification":null,"MeteringPoints":null,"ReportSubscriptions":null,"IsAmr":null,"ShowOldContracts":null,"IsProductionMeteringPoint":false,"IsTarificationOfSelectedMeteringpointGeneralEnergy":false,"HasMinutes15Data":false,"ExcelReportStartDate":null,"MeteringPointId":0,"ConsumptionPoints":null};
+
+        //---------loadYearData-------------
+        var fullModel = null;
+        var showProductionBtn = false;
+
+    </script>
+
+    <script id="HeatingReadingDataTemplate" type="text/x-jquery-tmpl">
+        <h2>Kaukolämpölukemien historia</h2>
+        <table class="datatable reportMonthTableContainer table table-bordered" id="readings" style="clear: both;">
+            <thead>
+                <tr>
+                    <th>Lukeman alkupäivämäärä</th>
+                    <th>Lukeman loppupäivämäärä</th>
+                    <th>Kulutus (MWh)</th>
+                    <th>Lukema</th>
+                    <th>Kiertovesimäärä (m<sup>3</sup>)</th>
+                    <th>Kiertoveden lukema</th>
+                    <th>Jäähtymä</th>
+                    <th>Kustannukset yhteensä (€)</th>
+                    <th>Kustannukset perusmaksu (€)</th>
+                    <th>Kustannukset energia (€)</th>
+                    <th>Mittari</th>
+                </tr>
+            </thead>
+            {{each(i, reading) PowerReadings}}
+            <tr>
+                <td>${parseNETDate(reading.Start).toString('dd.MM.yyyy')}</td>
+                <td>${parseNETDate(reading.Stop).toString('dd.MM.yyyy')}</td>
+                <td>${reading.Consumption.toFixed(3).replace('.',',')}</td>
+                <td>${reading.MeterReading.toFixed(0)}</td>
+                <td>${ $data.WaterFlowReadings[i].Consumption.toFixed(2).replace('.',',') }</td>
+                <td>${ $data.WaterFlowReadings[i].MeterReading.toFixed(0) }</td>
+                <td>
+                    {{if ($data.WaterFlowReadings[i].Consumption != null && $data.WaterFlowReadings[i].Consumption > 0) }}
+                    ${ ((reading.Consumption * 1000) / ($data.WaterFlowReadings[i].Consumption * 1.163)).toFixed(2).replace('.',',') }
+                    {{else}}
+                    -
+                    {{/if}}
+                </td>
+                <td>${ $data.TotalCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td>${ $data.BasicCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td>${ $data.EnergyCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td>${reading.Meter}</td>
+            </tr>
+            {{/each}}
+        </table>
+
+    </script>
+
+    <script id="GasReadingDataTemplate" type="text/x-jquery-tmpl">
+        <h2>Kaasulukemien historia</h2>
+        
+        <table class="datatable reportMonthTableContainer table table-bordered" id="readings" style="clear: both;">
+            <thead>
+                <tr>
+                    <th>Lukeman alkupäivämäärä</th>
+                    <th>Lukeman loppupäivämäärä</th>
+
+                    <th>Kulutus (MWh)</th>
+                    <th>Mittari</th>
+                </tr>
+            </thead>
+
+            {{each(i, reading) GasReadings}}
+            <tr>
+                <td>${parseNETDate(reading.Start).toString('dd.MM.yyyy')}</td>
+                <td>${parseNETDate(reading.Stop).toString('dd.MM.yyyy')}</td>
+                <td>${reading.Consumption.toFixed(3).replace('.',',')}</td>
+                <td>${reading.Meter}</td>
+            </tr>
+            {{/each}}
+        </table>
+    </script>
+
+    <script id="WaterReadingDataTemplate" type="text/x-jquery-tmpl">
+        <h2>Vesilukemien historia</h2>
+        <table id="readings">
+            <tr>
+                <th class="readings-col-header">Lukeman alkupäivämäärä</th>
+                <th class="readings-col-header">Lukeman loppupäivämäärä</th>
+                <th class="readings-col-header">Kulutus (m<sup>3</sup>)</th>
+                <th class="readings-col-header">Keskimääräinen päiväkulutus (l)</th>
+                <th class="readings-col-header" optional"">Lukema</th>
+                <th class="readings-col-header">Kustannukset yhteensä (€)</th>
+                <th class="readings-col-header optional">Puhdas- ja jätevesi, perusmaksu (€)</th>
+                <th class="readings-col-header optional">Puhdasvesi, kulutusmaksu (€)</th>
+                <th class="readings-col-header optional">Jätevesi, kulutusmaksu (€)</th>
+                <th class="readings-col-header optional">Hulevesimaksu (€)</th>
+            </tr>
+
+            {{each(i, reading) WaterReadings}}
+            <tr>
+                <td>${reading.Start.toString('dd.MM.yyyy')}</td>
+                <td>${reading.Stop.toString('dd.MM.yyyy')}</td>
+                <td>${reading.Consumption.toFixed(2).replace('.',',')}</td>
+                <td>${(reading.AvgDailyConsumption*1000).toFixed(2).replace('.',',')}</td>
+                <td class='optional'>${reading.MeterReading.toFixed(0)}</td>
+                <td>${ $data.TotalCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td class='optional'>${ $data.CleanWaterBasicCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td class='optional'>${ $data.CleanWaterUsageCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td class='optional'>${ $data.WasteWaterUsageCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+                <td class='optional'>${ $data.RainWaterBasicCosts[i].Cost.toFixed(2).replace('.',',') }</td>
+            </tr>
+            {{/each}}
+        </table>
+    </script>
+
+    <script id="ComparisonInfoTemplate" type="text/x-jquery-tmpl">
+        <p>
+            {{if isValid == true}}
+
+            {{if yearlyConsumption > 0}}
+            Viime vuoden ajalta sähkön käyttönne on ollut 
+            {{if yearlyConsumption > comparisonGroupConsumptionHigh }}
+            vertailuryhmäänne nähden suurempaa.
+            {{else yearlyConsumption < comparisonGroupConsumptionLow }}
+            vertailuryhmäänne nähden säästäväistä.
+            {{else}}
+            vertailuryhmäänne nähden keskimääräinen tulos.
+            {{/if}}
+            {{/if}}
+
+            Vertailutiedot:
+            <br />
+            <ul>
+                {{if yearlyConsumption > 0}}
+                <li>Sähkön käyttönne on vuosi tästä taaksepäin ollut  <span>${yearlyConsumption.toFixed(0)}</span> kWh </li>
+                {{/if}}
+                <li>Säästäväinen sähkön käyttö on alle <span>${comparisonGroupConsumptionLow}</span> kWh vuodessa.</li>
+                <li>Paljon kuluttavan sähkön käyttö on yli <span>${comparisonGroupConsumptionHigh}</span> kWh vuodessa.</li>
+            </ul>
+            {{else}}
+            Mikäli haluat vertailla kulutustasi muihin vastaaviin kohteisiin, anna käyttöpaikkasi tiedot painamalla 'Muuta käyttöpaikan profiilia'.
+            {{/if}}
+        </p>
+    </script>
+
+    <script id="ComparisonInfoDHTemplate" type="text/x-jquery-tmpl">
+        <p>
+            {{if isValid == true}}
+
+            {{if yearlyConsumption > 0}}
+            Viime vuoden ajalta lämmön käyttönne on ollut 
+            {{if yearlyConsumption > comparisonGroupConsumptionHigh }}
+            vertailuryhmäänne nähden suurempaa.
+            {{else yearlyConsumption < comparisonGroupConsumptionLow }}
+            vertailuryhmäänne nähden säästäväistä.
+            {{else}}
+            vertailuryhmäänne nähden keskimääräinen tulos.
+            {{/if}}
+        <p />
+        {{/if}}
+
+        Vertailutiedot:
+        <br />
+        <ul>
+            {{if yearlyConsumption > 0}}
+            <li>Lämmön käyttönne on vuosi tästä taaksepäin ollut  <span>${yearlyConsumption.toFixed(0)}</span> MWh </li>
+            {{/if}}
+            <li>Säästäväinen lämmön käyttö on alle <span>${comparisonGroupConsumptionLow}</span> MWh vuodessa.</li>
+            <li>Paljon kuluttavan lämmön käyttö on yli <span>${comparisonGroupConsumptionHigh}</span> MWh vuodessa.</li>
+            {{if yearlyWaterFlow > 0 && comparisonGroupWaterFlowLow > 0 && comparisonGroupWaterFlowHigh}}
+            <li>Virtaama on vuosi tästä taaksepäin ollut  <span>${yearlyWaterFlow.toFixed(0)}</span> m3 </li>
+            <li>Säästäväinen virtaama on alle <span>${comparisonGroupWaterFlowLow}</span> m3 vuodessa.</li>
+            <li>Paljon kuluttavan virtaama on yli <span>${comparisonGroupWaterFlowHigh}</span> m3 vuodessa.</li>
+            {{/if}}
+        </ul>
+        {{else}}
+        Mikäli haluat vertailla kulutustasi muihin vastaaviin kohteisiin, anna käyttöpaikkasi tiedot painamalla 'Muuta käyttöpaikan profiilia'.
+        {{/if}}
+        </p>
+    </script>
+
+    <script id="ComparisonInfoDHTemplate" type="text/x-jquery-tmpl">
+        <p></p>
+    </script>
+
+    <script id="ComparisonInfoWaterTemplate" type="text/x-jquery-tmpl">
+        <p>
+            {{if isValid == true}}
+            Keskimääräinen kulutus Suomessa per asukas on 155 litraa vuorokaudessa. Taloutenne keskikulutus vuorokaudessa oli viime lukemavälillä <b>${consumption.toFixed(0)}</b> litraa vuorokaudessa.
+            {{/if}}
+        </p>
+    </script>
+
+    <script id="ElectricityReadingDataTemplate" type="text/x-jquery-tmpl">
+        <h2>Lukemahistoria</h2>
+        <table id="readings">
+            <thead>
+                <tr>
+                    <th>Lukeman alkupäivämäärä</th>
+                    <th>Lukeman loppupäivämäärä</th>
+                    <th>Kulutus yhteensä (kWh)</th>
+                    <th>Lukema</th>
+                    <th>Mittari</th>
+                </tr>
+            </thead>
+            {{each(i, reading) Readings}}
+            <tr>
+                <td>${reading.Total.Start.toString('dd.MM.yyyy')}</td>
+                <td>${reading.Total.Stop.toString('dd.MM.yyyy')}</td>
+                <td>${reading.Energy1.Consumption.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Energy1.MeterReading.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Total.Meter}</td>
+            </tr>
+            {{/each}}
+        </table>
+    </script>
+
+    <script id="ElectricityReadingDataHighAndLowTariffTemplate" type="text/x-jquery-tmpl">
+        <h2>Lukemahistoria</h2>
+
+        <table id="readings">
+            <thead>
+                <tr>
+                    <th>Lukeman alkupäivämäärä</th>
+                    <th>Lukeman loppupäivämäärä</th>
+                    <th>Kulutus yhteensä (kWh)</th>
+                    <th>Kulutus ${Energy1Component} (kWh)</th>
+                    <th>Lukema ${Energy1Component}</th>
+                    <th>Kulutus ${Energy2Component} (kWh)</th>
+                    <th>Lukema ${Energy2Component}</th>
+                    <th>Mittari</th>
+                </tr>
+            </thead>
+            {{each(i, reading) Readings}}
+            <tr>
+                <td>${reading.Total.Start.toString('dd.MM.yyyy')}</td>
+                <td>${reading.Total.Stop.toString('dd.MM.yyyy')}</td>
+                <td>${reading.Total.Consumption.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Energy1.Consumption.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Energy1.MeterReading.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Energy2.Consumption.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Energy2.MeterReading.toFixed(2).replace('.',',')}</td>
+                <td>${reading.Total.Meter}</td>
+            </tr>
+            {{/each}}
+        </table>
+
+    </script>
+
+    <script id="comparisonTemplate" type="text/x-jquery-tmpl">
+        {{if (diff > 0)}}
+        ${diff.toFixed(digits).replace('.',',') + ' ' + unit} vähemmän.
+        {{else (diff < 0)}}
+        ${(-diff).toFixed(digits).replace('.',',') + ' ' + unit} enemmän.
+        {{else}}
+        saman verran.
+        {{/if}}
+    </script>
+
+    <script id="temperatureStatisticsTemplate" type="text/x-jquery-tmpl">
+        {{if showTemperature}}
+        <div class="span6 temperatureStatistics">
+            {{else}}
+            <div class="span6 temperatureStatistics" style="display: none;">
+                {{/if}}
+                <p>
+                    <br />
+                    {{if minTemp}}
+                    Alin: <span>${minTemp.toFixed(1).replace('.',',')} &deg;C</span>
+                    {{/if}}
+                    {{if avgTemp}}
+                    Keskilämpötila: <span>${avgTemp.toFixed(1).replace('.',',')} &deg;C</span>
+                    {{/if}}
+                    {{if maxTemp}}
+                    Ylin: <span>${maxTemp.toFixed(1).replace('.',',')} &deg;C</span>
+                    {{/if}}
+                </p>
+            </div>
+        </div>
+    </script>
+
+    <script id="comparisonPeriodTemplate" type="text/x-jquery-tmpl">
+        <div class="inner">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Vertailuajanjakso <span>(${from.formatTime($item.dateFormat)} - ${to.formatTime($item.dateFormat)})</span>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        Kulutus yhteensä: ${consumption.toFixed(digits).replace('.',',') + " " + unit}<br />
+                        {{if ($item.enablePriceSeries && expenses)}}
+                        {{if (customerType != 1) }}
+                        Kustannukset yhteensä (ALV 0%): <span>${expenses.toFixed(2).replace('.',',')} &euro;</span><br />
+                        {{else}}
+                        Kustannukset yhteensä: <span>${expenses.toFixed(2).replace('.',',')} &euro;</span><br />
+                        {{/if}}
+                        {{/if}}
+                    </p>
+                    {{tmpl({ showTemperature: showTemperature, minTemp: minTemp, maxTemp: maxTemp, avgTemp: avgTemp }) "#temperatureStatisticsTemplate" }}
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script id="currentPeriodTemplate" type="text/x-jquery-tmpl">
+        <p>
+            Kulutus yhteensä: <span id="currentConsumption">${consumption.toFixed(digits).replace('.',',')} ${unit}.</span><br />
+            
+
+            {{if (HeatedFloorArea != null) }}
+            Energiatehokkuus: <span id="energyEffiency">${(consumption/HeatedFloorArea).toFixed(digits).replace('.',',')} ${unit}/m2</span>
+            <br />
+            {{/if}}
+
+            {{if ($item.enablePriceSeries && expenses) }}
+            {{if (customerType != 1) }}
+            Kustannukset yhteensä (ALV 0 %): <span id="currentExpenses">${expenses.toFixed(2).replace('.',',')} &euro;</span>
+            {{else}}
+            Kustannukset yhteensä: <span id="currentExpenses">${expenses.toFixed(2).replace('.',',')} &euro;</span>
+            {{/if}}
+            <br />
+            {{/if}}
+
+            {{if prevConsumption}}
+            Edellisen vuoden vastaavaan ajankohtaan verrattuna kulutuksenne on 
+            {{tmpl( { diff: prevConsumption, unit: unit, digits: digits } ) "#comparisonTemplate"}}
+            {{/if}}
+            {{if nextConsumption}}
+            Seuraavan vuoden vastaavaan ajankohtaan verrattuna kulutuksenne on 
+            {{tmpl( { diff: nextConsumption, unit: unit, digits: digits } ) "#comparisonTemplate"}}
+            {{/if}}
+        </p>
+
+        {{if $item.enableTemperature == true }}
+        {{tmpl( { showTemperature: showTemperature, minTemp: minTemp, maxTemp: maxTemp, avgTemp: avgTemp }) "#temperatureStatisticsTemplate" }}
+        {{/if}}
+    </script>
+
+    
+</head>
+
+<body>
+        <!-- Google Tag Manager (noscript) -->
+        <noscript>
+            <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5XMSQJ7"
+                    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>
+        <!-- End Google Tag Manager (noscript) -->
+
+    <header class="container">
+        <a class="sr-only" href="#main">Hyppää sisältöön</a>
+        <div class="logo">
+
+            <a href="/eServices/Online">
+                
+                    <img class="logoimage white-background" src="/Content/LRE2/images/logo_minunenergia_uusi.png?version=NjM4OTkxMzA4MTYxNjc4ODU5" alt="MinunEnergia" />
+            </a>
+        </div>
+    </header>
+    <nav class="container printExcluded">
+        <div class="navbar navbar-default">
+            <div class="navbar-bordered">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Avaa navigaatio</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                                            <a style="padding-top:12px;" class="navbar-brand" href="/eServices/Online">Etusivu</a>
+                </div>
+                <div class="navbar-collapse collapse">
+
+                        <ul class="nav navbar-nav">
+                            
+
+                                <li><a href="/Feedback/Feedback/ContactInbox"><span class="glyphicon glyphicon-envelope"></span>&nbsp;Viestit</a></li>
+
+                                <li><a href="/Reporting/CustomerConsumption?loadLastYearData=True"><span class="glyphicon glyphicon-stats navIconWhite"></span>&nbsp;Käytön raportointi</a></li>
+                                                            <li><a href="/eServices/ReadingEntry"><span class="glyphicon glyphicon-dashboard"></span>&nbsp;Lukemien syöttö</a></li>
+                                                            <li><a href="/eServices/ContractInformation"><span class="glyphicon glyphicon-briefcase"></span>&nbsp;Sopimukset</a></li>
+
+                                <li><a href="/eServices/Invoice?yearLimit=10"><span class="glyphicon glyphicon-euro"></span>&nbsp;Laskut</a></li>
+
+                                <li><a href="/eServices/ExternalOutages"><span class="glyphicon glyphicon-bell"></span>&nbsp;Häiriötiedotteet</a></li>
+                                                            <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-tags"></span><span>&nbsp;Liittymät</span><span class="caret"></span></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li></li>
+                                        <li><a role="menuitem" href="/Connection/Connection/Applications"><span class="glyphicon glyphicon-tag"></span>&nbsp;Liittymätilaus</a></li>
+                                        <li><a role="menuitem" href="/eServices/EServicesConnection/IndexAllListed"><span class="glyphicon glyphicon-tag"></span>&nbsp;Liittymätilausten seuranta</a></li>
+                                    </ul>
+                                </li>
+
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Käyttäjätilivalikko"><span class="glyphicon glyphicon-user"></span><span class="hidden-md">&nbsp;</span>Tili<span class="caret"></span></a>
+
+
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="dropdown-header">&nbsp;samisaalasti</li>
+                                    <li role="separator" class="divider"></li>
+                                    <li></li>
+
+
+                                        <li><a role="menuitem" href="/eServices/MyInformation/Permissions"><span class="glyphicon glyphicon-lock"></span>&nbsp;Käyttöoikeudet</a></li>
+                                                                            <li><a role="menuitem" href="/eServices/MyInformation/AccountInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;Omat tiedot</a></li>
+
+                                    <li class="divider"></li>
+                                    <li><a role="menuitem" href="/eServices/Online/Logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;Kirjaudu ulos</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    
+    <ul class="nav navbar-nav navbar-right">
+        
+    </ul>
+
+
+                </div><!--/.navbar-collapse -->
+            </div>
+        </div>
+    </nav>
+    <div role="alert" id="infoArea" class="row" style="display: none;">
+        <div class="col-lg-12">
+            <div class="alert alert-dismissable alert-warning">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong id="infoMessage">  </strong>
+            </div>
+        </div>
+    </div>
+    <main id="main">
+        ﻿
+
+
+
+
+<div id="rootContainer" class="container">
+    <input name="__RequestVerificationToken" type="hidden" value="h9DzoSDQW78Z0ZM8ZMV1X_k7fB9OaiE_6y4I-qU0b11mpKDnIayv7lpm4zR3F1Fm7RWQ6bOWYMZGnXD8xqFIthov5icYxqBj9dXMg-jV92RhO3xxIGUBq-7SGKygtLQH0" />
+    <div class="row hidden-xs hidden-sm">
+        <div class="col-md-12 col-lg-12">
+            <h1>Käytön raportointi</h1>
+        </div>
+    </div>
+
+    <div class="row hidden-lg hidden-md">
+        <div class="col-xs-12 col-sm-12">
+            <h4>Käytön raportointi</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-stats" aria-label="Left Align"></span>&nbsp;Raportointi
+                    <a tabindex="0" aria-label="Raportointi, ohje" href="javascript:void(0)" class="link pull-right hidden-xs hidden-sm" role="button" data-toggle="popover" data-placement="left" title="Ohje" data-content="Voit vaihtaa käyttöpaikkaa alla olevasta valikosta. Voit vaihtaa ajanjaksoa maalaamalla ajanjakson kuvasta tai valitsemalla halutut päivämäärät. Voit ladata vuosikulutusraportin painamalla 'Lataa vuosiraportti'"><span class="glyphicon glyphicon-info-sign"></span></a>
+                    <a tabindex="0" aria-label="Raportointi, ohje" href="javascript:void(0)" class="link pull-right hidden-lg hidden-md" role="button" data-toggle="popover" data-placement="left" title="Ohje" data-content="Voit vaihtaa käyttöpaikkaa alla olevasta valikosta. Voit vaihtaa ajanjaksoa valitsemalla halutut päivämäärät."><span class="glyphicon glyphicon-info-sign"></span></a>
+
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label for="meteringPointSelector">Käyttöpaikka</label>
+                                <select id="meteringPointSelector" class="selectBox input-xlarge" title="Valitse käyttöpaikka">
+
+                                </select>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="list-group-item  hidden-xs ConsumptionControls ReportingControls">
+                        <div id="overview" style="width: 100%; height: 120px">
+                        </div>
+                    </li>
+                    <li class="list-group-item ReportingControls">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <form class="form-inline">
+                                    <fieldset>
+                                        <legend style="display:none">Raportointi</legend>
+                                        <div class="form-group">
+                                            <label class="hidden-md hidden-lg">Ajanjakso</label>
+                                            <label class="hidden-xs hidden-sm" for="startDateSelector">Alkuaika</label>
+                                            <input type="text" class="form-control input-sm" style="position:relative;z-index: 1000" id="startDateSelector" title="Syötä ajanjakson alkupäivämäärä">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="hidden-xs hidden-sm" for="endDateSelector">Loppuaika</label>
+                                            <input type="text" class="form-control input-sm" style="position:relative;z-index: 1000" id="endDateSelector" title="Syötä ajanjakson loppupäivämäärä">
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-sm" id="updateInterval">
+                                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;Hae
+                                        </button>
+                                        <br /><br />
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-default btn-sm" id="lastYear">
+                                                <span class="hidden-xs" aria-hidden="true">Viimeiset 12 kuukautta</span><span class="hidden-md hidden-lg hidden-sm">12KK</span>
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-sm ConsumptionControls" id="lastTwoWeeks">
+                                                <span class="hidden-xs" aria-hidden="true">Viimeiset 2 viikkoa</span><span class="hidden-md hidden-lg hidden-sm">2VKO</span>
+                                            </button>
+                                        </div>
+                                        <br /><br />
+                                        <div class="form-group">
+                                            <div style="width:100%" id="graphNavigation"></div>
+                                        </div>
+                                    </fieldset>
+                                </form>
+                            </div>
+                            <div class="col-sm-4 ConsumptionControls">
+                                <!-- loadYearData -->
+                                <span id="fullDataOnLoad">
+                                                                            
+                                            Koko historiatietoa ladataan...<img alt="Ladataan..." style='vertical-align: middle; margin-right: 4px; height: 1em;' src='/Content/default/images/busy-48.gif?version=NjM4OTkxMzA4MTU2MDY4NDYz' />
+                                        
+                                        <br />
+                                </span>
+                                <span id="fullDataReady" style="display:none;">
+                                    <button type="button" class="btn btn-default btn-sm" style="margin-top:5px;" id="useFullModelBtn" aria-pressed="false">
+                                        &nbsp;Näytä kulutushistoria
+                                    </button>
+                                </span>
+                                <!----------------------------------------------->
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="panel-footer hidden-xs hidden-sm ConsumptionControls ReportingControls">
+                    Yllä olevasta kuvasta voit valita haluamasi tarkastelujakson hiirellä maalaamalla.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row ReportingControls">
+        <div id="chartContainer" class="col-lg-8">
+            <div class="panel panel-default">
+                <ul class="list-group">
+                    <li class="list-group-item" role="radiogroup">
+                        <div class="btn-group btn-group-toggle btn-group-sm" id="graph-option-buttons-1" role="group" data-toggle="buttons">
+                            <label type="button" class="btn btn-default consumptionBtn active" aria-pressed="true" id="navConsumption">
+                                <input name="pillarDiagramValues" type="radio" id="pillarDiagramValuesOption1" autocomplete="off" checked />
+                                <span class="glyphicon glyphicon-flash" id="navConsumption"></span>
+                                <span class="hidden-xs" id="navConsumption">
+                                    &nbsp;
+Kulutus                                </span>
+                            </label>
+                            <label type="button" class="btn btn-default consumptionBtn" id="navMoney">
+                                <input name="pillarDiagramValues" type="radio" id="pillarDiagramValuesOption2" autocomplete="off" />
+                                <span class="glyphicon glyphicon-euro" id="navMoney"></span>
+                                <span class="hidden-xs" id="navMoney">&nbsp;Kustannukset</span>
+                            </label>
+                        </div>
+
+                        <!--
+                        <button id="pricesPieChartHeader" type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#costDivisionModal">
+                            <span class="glyphicon glyphicon-adjust"></span>&nbsp;Kustannusten jakautuminen
+                        </button>
+                        -->
+
+                                                <button type="button" class="btn btn-default btn-sm ConsumptionControls" id="showTemperatureCorrectedEnergy" data-toggle="button" aria-pressed="false" autocomplete="off" style="outline: none;">
+                            &nbsp;Lämpötilakorjattu lämmönkäyttö
+                        </button>
+                                                                                            </li>
+
+                    <li class="list-group-item ConsumptionControls">
+                        <div class="btn-group btn-group-toggle btn-group-sm" role="group" data-toggle="buttons">
+                            <label type="button" class="btn btn-default period_button resolutionBtn" data-resolution="Year" id="navYearResolution" tabindex="0">
+                                <input name="resolutionOptions" type="radio" id="resolutionOptionYear" autocomplete="off" />
+                                <span class="hidden-xs">Vuosi</span>
+                                <span class="hidden-md hidden-lg hidden-sm">VV</span>
+                            </label>
+                            <label type="button" class="btn btn-default period_button resolutionBtn" data-resolution="Month" aria-pressed="true" id="navMonthResolution" tabindex="0">
+                                <input name="resolutionOptions" type="radio" id="resolutionOptionMonth" autocomplete="off" />
+                                <span class="hidden-xs">Kuukausi</span>
+                                <span class="hidden-md hidden-lg hidden-sm">KK</span>
+                            </label>
+                            <label type="button" class="btn btn-default period_button resolutionBtn" data-resolution="Week" id="navWeekResolution" tabindex="0">
+                                <input name="resolutionOptions" type="radio" id="resolutionOptionWeek" autocomplete="off" />
+                                <span class="hidden-xs">Viikko</span>
+                                <span class="hidden-md hidden-lg hidden-sm">VKO</span>
+                            </label>
+                            <label type="button" class="btn btn-default period_button resolutionBtn" data-resolution="Day" id="navDayResolution" tabindex="0">
+                                <input name="resolutionOptions" type="radio" id="resolutionOptionDay" autocomplete="off" />
+                                <span class="hidden-xs">Päivä</span>
+                                <span class="hidden-md hidden-lg hidden-sm">PV</span>
+                            </label>
+                            <label type="button" class="btn btn-default period_button resolutionBtn" data-resolution="Hour" id="navHourResolution" tabindex="0">
+                                <input name="resolutionOptions" type="radio" id="resolutionOptionHour" autocomplete="off" />
+                                <span class="hidden-xs">Tunti</span>
+                                <span class="hidden-md hidden-lg hidden-sm">H</span>
+                            </label>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div id="consumptionChart" style="width: 100%; height: 400px;">
+                        </div>
+                    </li>
+
+
+                    <li class="list-group-item">
+                        <div style="width:100%" id="consumptionLegends">
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div id="graphResolutionSelection">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                                <button type="button" class="btn btn-default btn-sm prevnext_period_button" id='navPreviousPeriod'><span class="glyphicon glyphicon-backward"></span>&nbsp;Edellinen</button>
+                                <button type="button" class="btn btn-default btn-sm prevnext_period_button" id='navNextPeriod'>Seuraava&nbsp;<span class="glyphicon glyphicon-forward" style="margin-left: 5px; margin-right: 0;"></span></button>
+                            </div>
+                        </div>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="ConsumptionControls" id="currentItem" style="display: none; height: auto;margin-bottom: 10px">
+                <div class="inner">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Valittu jakso
+                            &nbsp<span id="currentViewInterval"></span>
+                        </div>
+                        <div class="panel-body">
+                            <div id="currentPeriod">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="Consumptioncontrols" id="previousSimilarItem" style="display: none;">
+            </div>
+
+            <div class="ConsumptionControls" id="nextSimilarItem" style="display: none;">
+            </div>
+
+            
+            <div class="panel panel-default ConsumptionControls hidden-xs hidden-sm">
+                <div class="panel-heading">
+                    Oman kulutuksen vertailu
+                    <a tabindex="0" aria-label="Oman kulutuksen vertailu, ohje" href="javascript:void(0)" class="link pull-right hidden-xs hidden-sm" role="button" data-toggle="popover" data-placement="left" title="Ohje" data-content="Voit vertailla kulutustasi klikkaamalla painiketta 'Vertaile kulutusta'"><span class="glyphicon glyphicon-info-sign"></span></a>
+                </div>
+                <div class="panel-body">
+                    Voit asettaa ja vertailla omaa kulutustasi kolmella eri ajanjaksolla.
+                    <div id="ReportCompare">
+                        
+<style>
+    .buttonicon {
+        height: 45px;
+        width: 45px;
+    }
+
+    #reportCompareModal .modal-dialog {
+        width: 900px; /* your width */
+    }
+</style>
+
+<script type="text/javascript">
+    var comparisonPeriodText = "Vertailujakso";
+    var consumptionText = "Kulutus:";
+    var temperatureText = "Lämpötila:";
+    comparisonError1Text = "Valitse vertailujakson alkuaika.";
+    comparisonError2Text = "Valitse vertailujakson pituus vuorokausina.";
+    var error1Text = "Valitse vertailujakson alku- ja loppupäivä.";
+    var error2Text = "Alkupäivä ei voi olla loppupäivää myöhemmin.";
+</script>
+
+<div class="modal fade" id="reportCompareModal" tabindex="-1" role="dialog" aria-labelledby="reportCompareModalLbl" style="z-index:100000000;">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <!-- wide-modal -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>                
+                <h3 class="modal-title" id="reportCompareModalLbl">Vertaile eri ajanjaksojen kulutusta</h3>
+            </div>
+
+            <div class="modal-body" id="reportDialogContent">
+                <div style="top: 0; left: 0; width: 100%; text-align: center;">
+                    <div id="alertMessageCompareReport" class="alert-message error" style="display: none;">
+                        <a class="close" href="#" onclick="$('#alertMessageCompareReport').hide(); return false;">&times;</a>
+                        <div id="alertMsgContainerReportCompare" class="alert alert-danger"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <p>
+                        Voit valita alla 3 eri ajanjaksoa kulutuksesi vertailua varten. Voit vertailla näiden ajanjaksojen kulutusta halutulla tarkkuudella (tunti, päivä, viikko, kuukausi). Vertailutiedot näytetään alla olevassa graafissa viivadiagrammina.
+                    </p>
+                </div>
+                <hr />
+                <form id="reportCompareForm">
+
+                    <h4>Vertailujaksojen asettaminen</h4>
+                    <div>
+                        <p>
+                            Voit asettaa kaikki kolme vertailujaksoa samanmittaisiksi antamalla ensimmäisen vertailujakson alkupäivämäärän, vertailujaksojen pituuden vuorokausina sekä painamalla 'Aseta päivämäärät' -valintaa.
+                        </p>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <label for="compareStart">Kaikkien vertailujaksojen alkuaika</label>
+                            <input class="form-control input-sm compareDate" id="compareStart" type="text">
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="periodLengthInDays">Vertailujakson pituus vuorokausina:</label>
+                            <input class="form-control input-sm" id="periodLengthInDays" type="text">
+                        </div>
+                        <div class="col-xs-4">
+                            <button class="btn btn-default btn-sm" id="setComparsionDatesBtn" style="margin-top:25px;" onclick="$.reportCompareDialogIntance().SetComparsionDates(); return false;">
+                                <span class="glyphicon glyphicon-calendar"></span>&nbsp;Aseta päivämäärät
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h4>Vertailujaksot</h4>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <fieldset>
+                                <legend style="display: none">Vertailujakso 1</legend>
+                                <b>Vertailujakso 1</b><br />
+                                <label for="start1">Alkupäivämäärä:</label>
+                                <input class="form-control input-sm compareDate" id="start1" type="text">
+                                <label for="end1">Loppupäivämäärä:</label>
+                                <input class="form-control input-sm compareDate" id="end1" type="text">
+                            </fieldset>
+                        </div>
+                        <div class="col-xs-4">
+                            <fieldset>
+                                <legend style="display: none">Vertailujakso 2</legend>
+                                <b>Vertailujakso 2</b><br />
+                                <label for="start2">Alkupäivämäärä:</label>
+                                <input class="form-control input-sm compareDate" id="start2" type="text">
+                                <label for="end2">Loppupäivämäärä:</label>
+                                <input class="form-control input-sm compareDate" id="end2" type="text">
+                            </fieldset>
+                        </div>
+                        <div class="col-xs-4">
+                            <fieldset>
+                                <legend style="display: none">Vertailujakso 3</legend>
+                                <b>Vertailujakso 3</b><br />
+                                <label for="start3">Alkupäivämäärä:</label>
+                                <input class="form-control input-sm compareDate" id="start3" type="text">
+                                <label for="end3">Loppupäivämäärä:</label>
+                                <input class="form-control input-sm compareDate" id="end3" type="text">
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h4>Tarkastelutarkkuus</h4>
+                    <div class="row">
+                        <fieldset>
+                            <legend style="display:none">Tarkastelutarkkuus</legend>
+                            <div class="btn-group btn-group-sm col-xs-8" data-toggle="buttons">
+                                <label tabindex="0" class="btn btn-default compareResolutionBtn" id="navMonthCompareResolution">
+                                    <input type="radio" name="options" autocomplete="off" title='Tarkastelutarkkuus - Kuukausi'>
+                                    <span class="hidden-xs">Kuukausi</span>
+                                    <span class="hidden-md hidden-lg hidden-sm">KK</span>
+                                </label>
+                                <label tabindex="0" class="btn btn-default compareResolutionBtn" id="navWeekCompareResolution">
+                                    <input type="radio" name="options" autocomplete="off" title='Tarkastelutarkkuus - Viikko'>
+                                    <span class="hidden-xs">Viikko</span>
+                                    <span class="hidden-md hidden-lg hidden-sm">VKO</span>
+                                </label>
+                                <label tabindex="0" class="btn btn-default compareResolutionBtn active" aria-pressed="true" id="navDayCompareResolution">
+                                    <input type="radio" name="options" autocomplete="off" checked="" title='Tarkastelutarkkuus - Päivä'>
+                                    <span class="hidden-xs">Päivä</span>
+                                    <span class="hidden-md hidden-lg hidden-sm">PV</span>
+                                </label>
+                                <label tabindex="0" class="btn btn-default compareResolutionBtn" id="navHourCompareResolution">
+                                    <input type="radio" name="options" autocomplete="off" title='Tarkastelutarkkuus - Tunti'>
+                                    <span class="hidden-xs">Tunti</span>
+                                    <span class="hidden-md hidden-lg hidden-sm">H</span>
+                                </label>
+                            </div>
+                        </fieldset>
+                        <div class="col-xs-4">
+                            <button class="btn btn-primary btn-sm" onclick="$.reportCompareDialogIntance().CompareDataClick(); return false;">
+                                <span class="glyphicon glyphicon-refresh"></span>&nbsp;Näytä vertailutiedot
+                            </button>
+                        </div>
+                    </div>
+                    <p />
+                    <div id="comparissionChart" style="width: 100%; height: 400px;">
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div align="right">
+                    <table role="presentation">
+                        <tr>
+                            <td>
+                                <a href="#" onclick="$('#reportCompareModal').modal('hide'); return false;" class="btn btn-default btn-sm">Sulje</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+                    </div>
+                </div>
+                <ul class="list-group hidden-xs">
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default btn-sm" id="reportCompareDialogButton" title="Toiminto avautuu ponnahdusikkunaan">
+                            <span class="glyphicon glyphicon-signal"></span>&nbsp;Vertaile kulutusta
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel panel-default ConsumptionControls hidden-xs hidden-sm">
+                <div class="panel-heading">
+                    Raporttitilaukset
+                    <a tabindex="0" aria-label="Raporttitilaukset, ohje" href="javascript:void(0)" class="link pull-right hidden-xs hidden-sm" role="button" data-toggle="popover" data-placement="left" title="Ohje" data-content="Voit tilata viikko- ja kuukausiraportteja sähköpostiisi klikkaamalla painiketta 'Raportointitilaukset'"><span class="glyphicon glyphicon-info-sign"></span></a>
+                </div>
+                <div class="panel-body">
+                    Halutessasi lähetämme tietoa kulutuksestasi sähköpostiisi viikoittain tai kuukausittain.
+                    <div id="ReportSubscription">
+                        <style>
+    .buttonicon {
+        height: 45px;
+        width: 45px;
+    }
+	
+</style>
+
+<div class="modal fade" id="reportSubscriptionModal" tabindex="-1" role="dialog" aria-labelledby="reportSubscriptionModalLabel" style="z-index:100000000;">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <!-- wide-modal -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Sulje"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="reportSubscriptionModalLabel">Raportointitilaukset</h4>
+            </div>
+
+            <div class="modal-body">
+				<div>
+                <p>
+                    Voit tilata viikko- ja kuukausiraportit kulutuksestasi sähköpostiisi. Raportointitilaukset tehdään käyttöpaikkakohtaisesti.
+                </p>
+                <p>
+                    Raportit lähetetään, kun olemme saaneet raportoitavan jakson kulutustiedot.
+                    Viikkoraportit lähetetään tyypillisesti tiistaisin ja kuukausiraportit kuukauden 2. päivä.
+                </p>
+				</div>
+                <p>
+                    Valitse alla käyttöpaikat, joille haluat tilata raportin ja lisää sähköpostiosoitteesi.
+                </p>
+                <form id="reportSubscriptionForm">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Käyttöpaikan osoite</th>
+                                <th>Sähköpostiosoite</th>
+                                <th>Viikko-raportti</th>
+                                <th>Kuukausi-raportti</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumptionPointRows">
+                            <tr id="SubscriptionRowTemplate" style="display:none;">
+                                <td class="ConsumptionPointAddress"></td>
+                                <td class="Email"><input type="text"></td>
+                                <td class="WeeklyReport"><input type="checkbox"></td>
+                                <td class="MonthlyReport"><input type="checkbox"></td>
+                                <td class="MeteringPointCode" style="display:none"><input type="hidden"></td>
+                                <td class="NetworkCompanyCode" style="display:none"><input type="hidden"></td>
+                                <td class="MpSourceCompanyCode" style="display:none"><input type="hidden"></td>
+                                <td class="CustomerCode" style="display:none"><input type="hidden"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="CommonEmailReg" style="display: none">
+                        <input type="checkbox" id="CommonEmailChkBox" aria-label="Onko sähköpostiosoite käytössä" title="Onko sähköpostiosoite käytössä"/>Sähköpostiosoite: 
+                        <input type="text" id="SubscriptionCommonEmail" aria-label="Sähköpostiosoite" title="Sähköpostiosoite" disabled="disabled" name="emailCommon" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a tabindex="0" href="javascript:void(0)" class="link pull-left" role="button" data-toggle="popover" data-placement="right" title="Ohje" data-content="Voit tilata raportteja ja muuttaa raporttien tilauksia muokkaamalla yllä olevia valintoja ja painamalla 'Tallenna muutokset'."><span class="glyphicon glyphicon-info-sign"></span></a>
+
+				<div align="right">
+				<table role="presentation">
+				<tr><td>
+                <a href="#" onclick="$('#reportSubscriptionModal').modal('hide'); return false;" class="btn btn-default btn-sm">Peruuta</a>
+				</td><td>
+                <a href="#" onclick="$.reportSubscriptionDialogIntance().SaveSubscriptionClick(); return false;" class="btn btn-primary btn-sm">Tallenna muutokset</a>
+				</td></tr>
+				</table>
+				</div>
+
+            </div>
+            <div style="position: fixed; top: 0; left: 0; width: 100%; text-align: center;">
+                <div id="alertMessageRegReportSubs" class="alert-message error" style="display: none;">
+                    <a class="close" aria-label="Sulje" href="#" onclick="$('#alertMessageReg').hide(); return false;">&times;</a>
+                    <div id="alertMsgContainerReportSubs"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+                    </div>
+                </div>
+                <ul class="list-group hidden-xs">
+                        <li class="list-group-item">
+                            <button class="btn btn-default btn-sm" id="reportSubscriptionDialogButton" title="Toiminto avautuu ponnahdusikkunaan">
+                                <span class="glyphicon glyphicon-home"></span>&nbsp;Raportointitilaukset
+                            </button>
+                        </li>
+                </ul>
+            </div>
+
+            <p class="visible-xs visible-sm">
+                Kaikki toiminnot eivät ole käytössä mobiiliversiossa.
+            </p>
+
+            <div class="modal fade bs-example-modal-sm" id="costDivisionModal" tabindex="-1" role="dialog" aria-labelledby="costDivisionModalLabel">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="costDivisionModalLabel">Kustannusten jakautuminen</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div id="pricesPieChart" class="pieChart"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Sulje</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="MeteringPointConsumptionHistoryNotes" class="ReportingControls">
+        
+
+
+<script type="text/javascript">
+    var noteSaveUrl = "/Reporting/CustomerConsumption/SaveConsumptionHistoryNote";
+    var noteDeleteUrl = "/Reporting/CustomerConsumption/DeleteConsumptionHistoryNote";
+</script>
+<div class="modal fade" id="meteringPointConsumptionHistoryNoteModal" tabindex="-1" role="dialog" aria-labelledby="meteringPointConsumptionHistoryNoteModalLabel" style="z-index:100000000;">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="meteringPointConsumptionHistoryNoteModalLabel">Muistiinpanot</h4>
+            </div>
+            <div class="modal-body">
+                <div id="noteSaveErrors" class="alert alert-error hide" style="clear: both">
+                </div>
+                <div id="noteSaveSuccess" class="alert alert-success hide" style="clear: both">
+                </div>
+                    <form class="form-horizontal">
+                        <input name="__RequestVerificationToken" type="hidden" value="BEGf3fi7MOPAj--W3AgNhutA84vG2qZi5cgA0BPO_RjgJI3yNqMx8Kyw_HQyPrDOau8jw_tOfP5smpd5oe-gFyG5MRgMClcD-0-I492Dys50NJVIDppj1ZOlHTDOrxPp0" />
+                        <input type="hidden" id="NoteId" name="NoteId" value="" />
+
+
+                        <div class="sectionTitle">
+
+                            <h4 id="noteFormHeader">&nbsp; Uusi muistiinpano</h4>
+
+
+                        </div>
+
+
+                        <div class="form-group required">
+                            <label for="NoteSubject" class="col-sm-2 control-label">Aihe</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control input-sm" id="NoteSubject" placeholder="Aihe" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-group required">
+                            <label for="NoteStartDate" class="col-sm-2 control-label">Alkuaika</label>
+                            <div class="col-sm-5">
+                                <input type="text" aria-label="Alkuaika, päivämäärä" class="form-control input-sm" id="NoteStartDate" name="NoteStartDate" placeholder="pp.kk.vvvv">
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="text" aria-label="Alkuaika, kellonaika" class="form-control input-sm" id="NoteStartTime" placeholder="00:00" value="00:00">
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Loppuaika</label>
+                            <div class="col-sm-5">
+                                <input type="text" aria-label="Loppuaika, päivämäärä" class="form-control input-sm" id="NoteEndDate" name="NoteStartDate" placeholder="pp.kk.vvvv">
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="text" aria-label="Loppuaika, kellonaika" class="form-control input-sm" id="NoteEndTime" placeholder="00:00" value="00:00">
+
+                            </div>
+                        </div>
+
+                        <p style="display:inline-block">
+                            Voit halutessasi jättää loppuajan tyhjäksi. Tällöin muistiinpano on voimassa alkuajasta eteenpäin.
+                        </p>
+
+                        <div class="form-group required">
+                            <label for="Note" class="col-sm-2 control-label">Kuvaus</label>
+                            <div class="col-sm-10">
+                                <textarea rows="5" class="form-control input-sm" id="Note" name="Note" cols="40" placeholder="Maks. 200 merkkiä"></textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+
+                                <div class="sopimusInfoActionButtons">
+                                    <a href="#" class="btn btn-default btn-sm hide" onclick="$.meteringConsumptionHistoryNoteDialogInstance().emptyForm();return false;" id='cancelNote'>
+                                        <span class="sopimusButtonText"> Peruuta</span>
+                                    </a>
+                                    <a href="#" class="btn btn-default btn-sm hide" style="background:red;" onclick="$.meteringConsumptionHistoryNoteDialogInstance().DeleteConsumptionHistoryNote();return false;" id='deleteNote'>
+                                        <span class="sopimusButtonText"> Poista</span>
+                                    </a>
+                                    <a href="#" class="btn btn-primary btn-sm" onclick="$.meteringConsumptionHistoryNoteDialogInstance().SaveConsumptionHistoryNoteClick();return false;" id='SaveConsumptionHistoryNoteButton'>
+                                        <span class="sopimusButtonText"> Tallenna muutokset</span>
+                                    </a>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </form>
+                    <hr />
+
+
+
+                <div id="noteTable" class="fullWidthContainer">
+
+                    
+                    <div class="sectionTitle">
+                        <h4>
+                            Tallennetut muistiinpanot
+                        </h4>
+                    </div>
+                    <table id="notes" class="notesTableContainer">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Alkuaika</th>
+                                <th>Loppuaika</th>
+                                <th>Aihe</th>
+                                <th>Kuvaus</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <a tabindex="0" href="javascript:void(0)" class="link pull-left" role="button" data-toggle="popover" data-placement="right" title="Ohje" aria-label="Ohje" data-content="Voit lisätä uusia muistiinpanoja lomakkeella. Aiemmin tallennettuja muistiinpanoja voit muokata valitsemalla alhaalla olevasta taulukosta muistiinpanon jota haluat muokata hiirellä klikkaamalla. Muistiinpanon pakolliset kentät on merkitty *-merkillä."><span class="glyphicon glyphicon-info-sign"></span></a>
+
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Sulje</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+    </div>
+
+    <div class="row hidden-sm hidden-xs ReportingControls">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-th"></span>&nbsp;Taulukko
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="btn-group btn-group-toggle btn-group-sm" role="group" data-toggle="buttons">
+                            <label type="button" id="showTable" class="btn btn-default active" aria-pressed="true" tabindex="0">
+                                <input type="radio" autocomplete="off" checked /><span class="glyphicon glyphicon-th-list"></span> Perustiedot
+                            </label>
+                            <label type="button" id="showFullTable" class="btn btn-default" tabindex="0">
+                                <input type="radio" autocomplete="off" /><span class="glyphicon glyphicon-th-list"></span> Täydet tiedot
+                            </label>
+                        </div>
+                        <button class="btn btn-sm btn-primary" id="ExportToExcel"><span class="glyphicon glyphicon-download-alt"></span> Siirrä Exceliin</button>
+                        <div id="ExcelMessage" style="display: none">Exceliin siirto epäonnistui. Yritä uudestaan.</div>
+                    </li>
+                </ul>
+                <div class="panel-body">
+                    <div class="ConsumptionControls" id="LoadExcel">
+                        
+                        <form action="/Reporting/CustomerConsumption/GetReport"
+                              method="post" target="_blank" onsubmit="" id="ExportToExcelForm">
+                            <input name="__RequestVerificationToken" type="hidden" value="jxbNbqIkdyJCB0LzDmdzl2vygn_-WdMDY948J1rFjS6JtTEUxnP3BQLvOcEqbxc2IjwkzTZv4h07nxdHKlfusbkuSwTxSiJZrCVa_WTFP-Nvxt6s7Y2JBcaZjrPJzuq50" />
+                            <input type="hidden" name="meteringPointCode" id="meteringPointCode" />
+                            <input type="hidden" name="product" id="product" />
+                            <input type="hidden" name="startDate" id="startDate" />
+                            <input type="hidden" name="endDate" id="endDate" />
+                            <input type="hidden" name="csvText" id="csvText" />
+                        </form>
+                    </div>
+
+                    <div style="margin-top:20px;margin-left: 10px;" id="tableDataContainer">
+                        <div id="MonthData"></div>
+                        <div id="DayData"></div>
+                        <div id="HourData"></div>
+                        <div id="WeekData"></div>
+                        <div id="YearData"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ConsumptionControls hidden-sm hidden-xs">
+        <input name="__RequestVerificationToken" type="hidden" value="ZyRbZv6-bkXC-oT4KJ8xt4Xi0b76spOaW8opj4NVy1iYZvjaLkVxY07jOlwKt5ZPMuYiXllWCNYYWRa6kVEhUJWqszUEnaCWDSxTcG7t8MK3rW6u8Eu8j8cXxXwAG_FW0" />
+        <div class="inner">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Excel-raportti
+                </div>
+                <div class="panel-body" id="excelReportContainer">
+                    <fieldset>
+                        <legend style="display: none">Excel raportti</legend>
+                        <p>Vie tiedot kaikista käyttöpaikoistasi Excel-tiedostoon valitsemalla raportin ajanjakso ja klikkaamalla Excel-raportti -painiketta. Raportin tekeminen saattaa kestää useita minuutteja.</p>
+
+                        <div class="form-group">
+                            <label for="excelReportInterval">Raportin aikajaottelu</label>
+                            <div class="btn-group" role="group" id="excelReportInterval">
+                                <button type="button" id="excelReportYear" class="excelReportTimeSpan btn btn-default" data-timespan="year">Vuosi</button>
+                                <button type="button" id="excelReportMonth" class="excelReportTimeSpan btn btn-default" data-timespan="month">Kuukausi</button>
+                                <button type="button" id="excelReportWeek" class="excelReportTimeSpan btn btn-default" data-timespan="week">Viikko</button>
+                                <button type="button" id="excelReportDay" class="excelReportTimeSpan active btn btn-default" data-timespan="day">Päivä</button>
+                                <button type="button" id="excelReportHour" class="excelReportTimeSpan btn btn-default" data-timespan="hour">Tunti</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="excelReportStartDate">Alkuaika</label>
+                                    <input id="excelReportStartDate" name="excelReportStartDate" class="datepicker form-control" title="Syötä Excel-raportin ajanjakson alkupäivämäärä" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="excelReportEndDate">Loppuaika</label>
+                                    <input id="excelReportEndDate" name="excelReportEndDate" class="datepicker form-control" title="Syötä Excel-raportin ajanjakson loppupäivämäärä" />
+                                </div>
+                            </div>
+                        </div>
+                        <button id="generateExcelReport" class="btn btn-default">Excel-raportti</button>
+                        <div id="iframeDownloader"></div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+    </div>
+</div>
+
+
+<script type='text/javascript' src='/dist/reporting-app-lre/vendor.js?version=NjM4OTk1OTAyNzA0Njg4MzM=' charset='utf-8'></script><script type='text/javascript' src='/dist/reporting-app-lre/vendor-vue.js?version=NjM4OTk1OTAyNzA0NzQ4NDk4' charset='utf-8'></script><script type='text/javascript' src='/dist/reporting-app-lre/app.js?version=NjM4OTk1OTAyNzA0MTY2MzI3' charset='utf-8'></script>
+
+    </main>
+    <aside class="row lre-container-full-width" style="margin-top: 15px;">
+        <div class="col-sm-2 col-sm-offset-3 hidden-xs">
+    <img src="/Content/LRE2/images/LRE-MinunEnergia-ajankohtaista-kuvanosto.png?version=NjM4OTkxMzA4MTYxNDgxNzY5" class="img-responsive lre-footer-img pull-right" alt="Lappeenrannan Energia" />
+</div>
+<div class="col-xs-4 col-xs-offset-4 hidden-sm hidden-md hidden-lg">
+    <img src="/Content/LRE2/images/LRE-MinunEnergia-ajankohtaista-kuvanosto.png?version=NjM4OTkxMzA4MTYxNDgxNzY5" class="img-responsive lre-footer-img center" alt="Lappeenrannan Energia" title="Lappeenrannan Energia" />
+</div>
+<div class="col-xs-4 hidden-sm hidden-md hidden-lg"></div>
+<div class="col-sm-3 col-xs-12">
+    <div class="text-left">
+        <a href="https://www.lappeenrannanenergia.fi/ajankohtaista/lappeenrannan-energian-kaukolammon-ja-veden-hinnat-112026-alkaen" target="_blank" title="Lappeenrannan Energia Oy:n pääsivu avautuu uuteen välilehteen">
+            <h2 class="lre-footer-heading lre-heading-arrow">Tiedote</h2>
+        </a>
+    </div>
+    <div class="text-center">
+        <p class="lre-footer-text">Lappeenrannan Energian kaukolämmön ja veden hinnat 1.1.2026 alkaen<br /><a href="https://www.lappeenrannanenergia.fi/ajankohtaista/lappeenrannan-energian-kaukolammon-ja-veden-hinnat-112026-alkaen" target="_blank" title="Lappeenrannan Energian kaukolämmön ja veden hinnat 1.1.2026 alkaen">Lue lisää</a></p>
+    </div>
+</div>
+    </aside>
+
+    <footer class="container printExcluded minunenergia-footer text-center">
+        <div class="row">
+            <div class="col-md-12 col-sm-5">
+                <div class="logo" style="margin-bottom: 10px;">
+                        <a href="http://www.lappeenrannanenergia.fi/" target="_blank"><img src="/Content/LRE2/images/logo_Lappeenrannan Energia.png?version=NjM5MTMxNzI3MTc2NTE4NTQy" alt="Lappeenrannan Energia" /></a>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-7">
+                <div>
+                    <p>Ongelmia palvelun käytössä? Ota yhteyttä asiakaspalveluumme. Puh. 020 690 505 (mpm/pvm) Email asiakaspalvelu@lreoy.fi</p>
+                    <a href="#" id="termsOfUse" data-toggle="modal" data-target="#termsOfUsageModal" title="Palvelun käyttöehdot avautuvat ponnahdusikkunaan">Käyttöehdot</a> |
+                    <a href="https://www.lappeenrannanenergia.fi/rekisteri-ja-tietoturvaseloste" target="_blank" title="Rekisteri- ja tietoturvaseloste avautuu uuteen välilehteen">Rekisteri- ja tietoturvaseloste</a> |
+                    <a href="https://www.lappeenrannanenergia.fi/saavutettavuusseloste" target="_blank" title="Saavutettavuusseloste avautuu uuteen välilehteen">Saavutettavuusseloste</a>
+                </div>
+            </div>
+        </div>
+        
+    </footer>
+    <div id="termsOfUsageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="termsOfUsageModalLabel">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="termsOfUsageModalLabel">Käyttöehdot</h3>
+            </div>
+            <div id="termsOfUsageBody" class="modal-body">
+                <div>
+    <h4>1.Yleistä</h4>
+
+    <p>Näitä käyttöehtoja sovelletaan Lappeenrannan Energia-konserniyhtiöiden (jäljempänä ”LRE”) asiakkailleen (jäljempänä ”Käyttäjä”) tuottamiin ja ylläpitämiin verkkopalveluihin (jäljempänä ”Online-palvelut”).</p>
+
+    <p>Online-palvelun Käyttäjän tulee olla juridinen tai luonnollinen henkilö. Online-palvelua voi käyttää vain täysi-ikäinen, oikeustoimikelpoinen henkilö ja näiden käyttöehtojen mukaisesti. Käyttäjän katsotaan hyväksyneen nämä ehdot rekisteröityessään palveluun.</p>
+
+    <p>Palvelun käyttäminen edellyttää Käyttäjältä internet-selainta sekä tarvittavia tietoliikenneyhteyksiä. Käyttäjä vastaa itse palvelun käyttämisen edellyttämien laitteiden ja ohjelmistojen hankkimisesta, toimivuudesta sekä niiden aiheuttamista kustannuksista. Online-palveluun rekisteröityminen ja sen käyttäminen on Käyttäjälle maksutonta. </p>
+
+
+    <h4>2.	Palvelun sisältö</h4>
+
+    <p>Online-palvelujen kautta Käyttäjä voi mm. </p>
+    <ol>
+        <li>päivittää omia käyttäjätietojaan; </li>
+        <li>tarkastella laskujaan, sopimuksiaan ja kulutustietojaan;</li>
+        <li>jättää yhteydenottopyyntöjä;</li>
+        <li>tehdä ja päättää sähkösopimuksen; </li>
+        <li>tilata häiriötiedotepalvelun, jonka avulla Käyttäjä saa halutessaan tekstiviestillä tai sähköpostilla tiedon kiinteistön sähkön, kaukolämmön tai maakaasun häiriöistä;</li>
+        <li>nähdä ja seurata LRE:n ajankohtaisia uutisia sekä LRE:n ja Käyttäjän välisiä yhteydenottoja</li>
+        <li>antaa palveluun käyttöoikeuksia valtuuttamalleen henkilölle.</li>
+    </ol>
+
+    <p>LRE:n asiakaspalvelu neuvoo Käyttäjää tarvittaessa Online-palvelun käyttöön liittyvissä kysymyksissä puhelimitse, sähköpostitse tai Online-palvelun välityksellä.</p>
+
+
+    <h4>3.Rekisteröityminen</h4>
+
+    <p>Palvelun käyttöönotto edellyttää rekisteröitymistä verkkopankkitunnuksilla (Tupas-tunnistautuminen). Rekisteröityessään Online-palveluun Käyttäjä luo henkilökohtaisen käyttäjätunnuksen ja salasanan. Käyttäjän rekisteröityminen vahvistetaan Online-palvelun lähettämällä sähköpostilla.</p>
+
+    <p>Käyttäjä vastaa käyttäjätunnuksensa ja salasanansa säilyttämisestä ja siitä, etteivät ne päädy ulkopuolisten tietoon tai haltuun. Käyttäjä on vastuussa käyttäjätunnuksellaan ja salasanallaan tai verkkopankkitunnuksillaan tapahtuneesta Online-palvelun käytöstä ja siitä aiheutuvista mahdollisista vahingoista ja kustannuksista. Käyttäjän tulee ilmoittaa LRE:lle viipymättä kaikista epäillyistä väärinkäytöksistä. </p>
+
+    <p>Mikäli Käyttäjä epäilee käyttäjätunnuksensa joutuneen ulkopuolisen tietoon, Käyttäjä voi vaihtaa salasanansa tai käyttäjätunnuksensa väärinkäytösten estämiseksi. Käyttäjä voi myös pyytää LRE:n asiakaspalvelua poistamaan tilin tai uusimaan salasanan.</p>
+
+
+    <h4>4.	Rekisteröinnin voimassaolo ja irtisanominen</h4>
+
+    <p>Käyttäjän käyttöoikeus Online-palveluun tulee voimaan, kun Käyttäjä on rekisteröitynyt Online-palveluun sekä ilmoittanut rekisteröitymisen yhteydessä pyydetyt tiedot. </p>
+
+    <p>Rekisteröidyttyään Käyttäjän käyttöoikeus on voimassa toistaiseksi. Kummallakin Osapuolella on oikeus irtisanoa Online-palvelun käyttöoikeus heti ilman erillistä irtisanomisaikaa. </p>
+
+
+    <h4>5.	Käyttäjän velvollisuudet ja vastuut</h4>
+
+    <p>Käyttäjä sitoutuu käyttämään Palvelua näiden käyttöehtojen mukaisesti. Palvelua ei saa käyttää tavalla, joka on haitallista, loukkaavaa tai vahingollista LRE:lle, yhteistyökumppaneille tai muille kolmansille osapuolille.</p>
+
+    <p>Käyttäjä on vastuussa kaikista palvelun kautta antamistaan tiedoista. Mikäli annetuissa tiedoissa on virheitä tai tiedot tuhoutuvat, on Käyttäjän pyydettäessä annettava uudet tiedot. Mikäli Käyttäjä huomaa Online-palvelussa tai asioidessaan virheen tai epäilee virhettä, Käyttäjän tulee ilmoittaa tästä viipymättä LRE:lle.</p>
+
+
+    <h4>6.	Tietoturva ja tietojen käyttäminen</h4>
+
+    <p>Käyttäjä ja LRE vastaavat kumpikin omien tietojärjestelmiensä ja verkkoyhteyksiensä tietoturvan asianmukaisesta järjestämisestä. LRE ei vastaa tietoturvariskien (esim. tietokonevirusten) Käyttäjälle aiheuttamista vahingoista, kuten tiedon häviämisestä tai muuttumisesta.</p>
+
+    <p>Osapuolet vastaavat omalta osaltaan siitä, että henkilötietoja käsitellään huolellisesti ja voimassa olevaa lainsäädäntöä noudattaen. LRE:n kotisivuille tallennetuissa asiakasrekisteriselosteissa on kuvattu, kuinka LRE käsittelee ja suojaa asiakkaiden henkilötietoja.</p>
+
+
+    <h4>7.	Palvelun käytettävyys ja oikeus palvelun keskeyttämiseen</h4>
+
+    <p>LRE pyrkii varmistamaan, että Online-palvelu olisi Käyttäjän käytössä jatkuvasti ja häiriöttä. Ennalta tiedossa olevista poikkeuksista Online-palvelun käytössä tiedotetaan palvelun kirjautumissivulla. Käyttäjä voi ilmoittaa LRE:lle havaitsemistaan käyttökatkoista tai -häiriöistä palvelun käytössä LRE:n asiakaspalveluun (asiakaspalvelu@lreoy.fi). </p>
+
+    <p>LRE:llä on oikeus tilapäisesti keskeyttää Online-palvelu, jos se on välttämätöntä Online-palvelun, sen muutoksen tai uudistamisen tai tietoliikenneverkon asennus-, muutos- ja huoltotöiden vuoksi. Huolto- yms. työt pyritään tekemään sellaiseen aikaan, että niistä aiheutuu Käyttäjälle mahdollisimman vähän haittaa ja palvelun keskeytys on mahdollisimman lyhyt. LRE ei vastaa Käyttäjälle edellä mainituista toimenpiteistä aiheutuneesta haitasta tai jos yllämainituista huoltotöistä johtuen Käyttäjän tarvitsee mukauttaa laitteita tai asetuksia Online-palvelun käyttämiseksi. </p>
+
+    <p>LRE:llä on oikeus keskeyttää Online-palvelujen tarjoaminen tilapäisesti tai pysyvästi, jos Käyttäjä ei noudata näitä käyttöehtoja tai on syytä epäillä, että Online-palvelua käytetään tavalla, josta saattaa seurata vahinkoa Osapuolille tai sivulliselle.</p>
+
+    <p>Ylivoimainen este (force majeure) vapauttaa LRE:n palveluun liittyvistä velvoitteista, mikäli se estää palveluun liittyvän suorituksen tai kohtuuttomasti haittaa sitä. Ylivoimaisena esteenä pidetään mm. tulipaloa, räjähdystä, lakkoa tai muuta työnseisausta, viranomaisen määräystä, energian toimituksessa esiintyviä häiriötä, ulkopuolisen aiheuttamaa tai ulkopuolisesta johtuvaa kaapeli- tai muu tietoliikennehäiriötä tai muuta sen kaltaista syytä, joka ei ole ollut tiedossa ja johon ei ole kohtuudella voitu varautua ennalta.</p>
+
+
+    <h4>8.	Oikeudet</h4>
+
+    <p>Online-palvelun kaikki oikeudet, tekijänoikeudet ja muut immateriaalioikeudet mukaan lukien ovat LRE:llä tai yhteistyökumppaneilla. Palvelussa julkaistavaa aineistoa saa käyttää ei-kaupalliseen ja henkilökohtaiseen tarkoitukseen. Käyttäjällä ei ole oikeutta Palvelun tai sen osan julkaisemiseen tai edelleen luovuttamiseen. </p>
+
+
+    <h4>9.	Palvelun käytöstä aiheutuva vahingonkorvausvelvollisuus</h4>
+
+    <p>Käyttäjä on velvollinen korvaamaan LRE:lle näiden käyttöehtojen, Palvelun käyttöä koskevan sopimuksen tai lain vastaisen käytön aiheuttamat vahingot. </p>
+
+    <p>LRE ei ole velvollinen korvaamaan palvelussa mahdollisesti esiintyvistä häiriöistä, viivästyksistä, virheistä, käytön estymisestä, käyttäjätunnusten toimimattomuudesta tai muusta palvelun käyttöön tai toimivuuteen liittyvän seikan aiheuttamasta vahingosta.</p>
+
+
+    <h4>10.	Online-palvelun ja käyttöehtojen muuttaminen ja siirtäminen</h4>
+
+    <p>LRE pidättää itsellään oikeuden muuttaa näiden käyttöehtojen sisältöä, palveluvalikoimaa, käyttöohjeita, tietoteknistä toimintaa ja Online-palvelun ulkoasua. Olennaisista muutoksista pyritään ilmoittamaan palvelun sivuilla hyvissä ajoin ennen muutosten voimaantuloa. Mikäli Käyttäjä käyttää näiden käyttöehtojen mukaisia Online-palveluja sen jälkeen, kun muutos on tullut voimaan, katsotaan Käyttäjän hyväksyneen muutoksen. </p>
+
+    <p>LRE:llä on oikeus siirtää Palvelu tai sen ylläpito sekä siihen liittyvät vastuut ja velvollisuudet sekä Palvelusta mahdollisesti tehty sopimus samaan konserniin kuuluvalle toiselle yhtiölle. LRE:llä on myös oikeus siirtää mainitut vastuut ja velvollisuudet sekä sopimus siinä tapauksessa, että LRE tai sen liiketoiminta siirretään toiselle yhtiölle kaupan, liiketoimintasiirron, sulautumisen tai jakautumisen seurauksena tai muuhun niihin verrattavan järjestelyn seurauksena.</p>
+
+
+    <h4>11.	Luottamuksellisuus</h4>
+
+    <p>Osapuolten on käsiteltävä toisen osapuolen luottamuksellista tietoa vähintään samalla huolellisuudella kuin ne käsittelevät omaa luottamuksellista tietoaan.</p>
+
+
+
+    <h4>12.	Sovellettava laki ja erimielisyyksien ratkaiseminen</h4>
+
+    <p>Näihin käyttöehtoihin sovelletaan Suomen lakia. Näihin käyttöehtoihin perustuvat tai näiden ehtojen tarkoittamaan Palveluun, Palvelukohtaisiin ehtoihin sekä Palvelusta mahdollisesti tehtyyn sopimukseen liittyvät erimielisyydet pyritään ratkaisemaan ensisijaisesti osapuolten välisin neuvotteluin. Mikäli tässä ei onnistuta kohtuullisessa ajassa, ratkaistaan riidat ensiasteena Etelä-Karjalan käräjäoikeudessa. Osapuolella on oikeus pyytää riitaan kuluttajariitalautakunnan ratkaisusuositusta.</p>
+
+</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn" data-dismiss="modal">Sulje</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script type='text/javascript' src='/dist/eservices-main-lre2/vendor.js?version=NjM4OTk1OTAyNzA0MTY2MzI3' charset='utf-8'></script><script type='text/javascript' src='/dist/eservices-main-lre2/app.js?version=NjM4OTk1OTAyNzA0MTY2MzI3' charset='utf-8'></script>
+</body>
+
+</html>

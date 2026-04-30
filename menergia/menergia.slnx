@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="menergia.api/menergia.api.csproj" />
+  <Project Path="menergia.base/menergia.base.csproj" />
+</Solution>
