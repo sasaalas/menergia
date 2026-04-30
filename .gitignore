@@ -8,3 +8,6 @@
 /menergia/menergia.api/obj
 /menergia/menergia.base/bin/Debug/net8.0
 /menergia/menergia.base/obj
+/menergia/menergia.api/appsettings.json
+/menergia/menergia.base/appsettings.json
+/menergia/menergia.api/menergia.api.csproj.user
