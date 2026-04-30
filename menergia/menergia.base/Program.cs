@@ -40,7 +40,7 @@ class Program
 
         // Load consumption data from extracted JSON file
         Console.WriteLine("Loading consumption data from extracted_model.json...");
-        _consumptionData = await _loginService.LoadConsumptionDataModelFromFileAsync("../extracted_model.json");
+        _consumptionData = await _loginService.LoadConsumptionDataModelFromFileAsync("../menergia.api/extracted_model.json");
 
         if (_consumptionData != null)
         {
