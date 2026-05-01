@@ -112,8 +112,9 @@ public class ConsumptionService
     {
         if (_consumptionData == null) return null;
 
-        var periodStart = new DateTime(2026, 4, 1);
-        var periodEnd = new DateTime(2026, 4, 29, 23, 59, 59);
+        var today = DateTime.Today;
+        var periodStart = new DateTime(today.Year, today.Month, 1, 0, 0, 0); // Start of the month
+        var periodEnd = today.AddDays(1).AddTicks(-1);
 
         var consumptionValues = GetSeriesValuesInRange(_consumptionData.Hours?.Consumption, periodStart, periodEnd);
         if (!consumptionValues.Any())
